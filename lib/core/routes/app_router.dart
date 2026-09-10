@@ -19,6 +19,11 @@ import '../../presentation/screens/itinerary/create_activity_screen.dart';
 import '../../presentation/screens/itinerary/activity_detail_screen.dart';
 import '../../presentation/screens/itinerary/edit_activity_screen.dart';
 import '../../domain/entities/trip_activity.dart';
+import '../../presentation/screens/expenses/expenses_screen.dart';
+import '../../presentation/screens/expenses/create_expense_screen.dart';
+import '../../presentation/screens/expenses/expense_detail_screen.dart';
+import '../../presentation/screens/expenses/edit_expense_screen.dart';
+import '../../domain/entities/expense.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -193,6 +198,60 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
                                   return EditActivityScreen(
                                     activity: activity,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      GoRoute(
+                        path: 'expenses',
+                        builder: (context, state) {
+                          final tripId =
+                              state.pathParameters['tripId']!;
+
+                          return ExpensesScreen(
+                            tripId: tripId,
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            path: 'create',
+                            builder: (context, state) {
+                              final tripId =
+                                  state.pathParameters['tripId']!;
+
+                              return CreateExpenseScreen(
+                                tripId: tripId,
+                              );
+                            },
+                          ),
+
+                          GoRoute(
+                            path: ':expenseId',
+                            builder: (context, state) {
+                              final tripId =
+                                  state.pathParameters['tripId']!;
+
+                              final expenseId =
+                                  state.pathParameters['expenseId']!;
+
+                              return ExpenseDetailScreen(
+                                tripId: tripId,
+                                expenseId: expenseId,
+                              );
+                            },
+                            routes: [
+                              GoRoute(
+                                path: 'edit',
+                                builder: (context, state) {
+                                  final expense =
+                                      state.extra as Expense;
+
+                                  return EditExpenseScreen(
+                                    expense: expense,
                                   );
                                 },
                               ),

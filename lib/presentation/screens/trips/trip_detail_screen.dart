@@ -299,7 +299,11 @@ class _TripDetailContent extends StatelessWidget {
             title: 'Expenses',
             subtitle:
                 'Track your travel spending',
-            onTap: () {},
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/expenses',
+              );
+            },
           ),
 
           const SizedBox(height: 12),
