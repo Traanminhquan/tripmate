@@ -116,3 +116,10 @@ final tripControllerProvider =
         void>(
   TripController.new,
 );
+
+final tripByIdProvider =
+    FutureProvider.family<Trip?, String>((ref, tripId) {
+  return ref
+      .read(tripRepositoryProvider)
+      .getTripById(tripId);
+});

@@ -188,7 +188,9 @@ class _TripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Trip detail sẽ làm ở bước tiếp theo.
+        context.push(
+          '/trips/${trip.id}',
+        );
       },
       borderRadius:
           BorderRadius.circular(16),
