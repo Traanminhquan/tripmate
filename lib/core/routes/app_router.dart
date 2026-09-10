@@ -4,8 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
+import '../../presentation/screens/explore/explore_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
+import '../../presentation/screens/main/main_screen.dart';
+import '../../presentation/screens/profile/profile_screen.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
+import '../../presentation/screens/trips/trips_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -74,11 +78,62 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      GoRoute(
-        path: '/home',
-        builder: (context, state) {
-          return const HomeScreen();
+      StatefulShellRoute.indexedStack(
+        builder: (
+          context,
+          state,
+          navigationShell,
+        ) {
+          return MainScreen(
+            navigationShell: navigationShell,
+          );
         },
+
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) {
+                  return const HomeScreen();
+                },
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/trips',
+                builder: (context, state) {
+                  return const TripsScreen();
+                },
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/explore',
+                builder: (context, state) {
+                  return const ExploreScreen();
+                },
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) {
+                  return const ProfileScreen();
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );
