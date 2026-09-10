@@ -5,4 +5,11 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
+
+  Future<User?> login({
+    required String email,
+    required String password,
+  });
+
+  Future<void> logout();
 }

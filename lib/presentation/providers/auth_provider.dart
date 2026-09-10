@@ -39,6 +39,28 @@ class AuthController extends AsyncNotifier<void> {
           );
     });
   }
+
+  Future<void> login({
+    required String email,
+    required String password,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).login(
+            email: email,
+            password: password,
+          );
+    });
+  }
+
+  Future<void> logout() async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).logout();
+    });
+  }
 }
 
 final authControllerProvider =
