@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/trip.dart';
 import '../../providers/trip_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class TripDetailScreen extends ConsumerWidget {
   Future<void> _deleteTrip(
@@ -85,57 +86,105 @@ class TripDetailScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final tripAsync =
-        ref.watch(tripByIdProvider(tripId));
+    final tripAsync = ref.watch(
+      tripByIdProvider(tripId),
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Trip Details'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Edit sẽ làm tiếp
-            },
-            icon: const Icon(Icons.edit_outlined),
-          ),
-          IconButton(
-            onPressed: () {
-              _deleteTrip(
-                context,
-                ref,
-              );
-            },
-            icon: const Icon(
-              Icons.delete_outline,
-            ),
-          ),
-        ],
-      ),
-      body: tripAsync.when(
-        loading: () => const Center(
+    final tripControllerState = ref.watch(
+      tripControllerProvider,
+    );
+
+    return tripAsync.when(
+      loading: () => const Scaffold(
+        body: Center(
           child: CircularProgressIndicator(),
         ),
-        error: (error, stackTrace) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              'Failed to load trip:\n$error',
-              textAlign: TextAlign.center,
-            ),
+      ),
+
+      error: (error, stackTrace) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Trip Details'),
+        ),
+        body: Center(
+          child: Text(
+            'Failed to load trip: $error',
           ),
         ),
-        data: (trip) {
-          if (trip == null) {
-            return const Center(
-              child: Text('Trip not found'),
-            );
-          }
-
-          return _TripDetailContent(
-            trip: trip,
-          );
-        },
       ),
+
+      data: (trip) {
+        if (trip == null) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                'Trip Details',
+              ),
+            ),
+            body: const Center(
+              child: Text(
+                'Trip not found',
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Trip Details',
+            ),
+            actions: [
+              IconButton(
+                onPressed:
+                    tripControllerState.isLoading
+                        ? null
+                        : () {
+                            context.push(
+                              '/trips/$tripId/edit',
+                              extra: trip,
+                            );
+                          },
+                icon: const Icon(
+                  Icons.edit_outlined,
+                ),
+              ),
+
+              IconButton(
+                onPressed:
+                    tripControllerState.isLoading
+                        ? null
+                        : () {
+                            _deleteTrip(
+                              context,
+                              ref,
+                            );
+                          },
+                icon: const Icon(
+                  Icons.delete_outline,
+                ),
+              ),
+            ],
+          ),
+          body: tripControllerState.isLoading
+              ? Stack(
+                  children: [
+                    _TripDetailContent(
+                      trip: trip,
+                    ),
+                    Container(
+                      color: Colors.black12,
+                      child: const Center(
+                        child:
+                            CircularProgressIndicator(),
+                      ),
+                    ),
+                  ],
+                )
+              : _TripDetailContent(
+                  trip: trip,
+                ),
+        );
+      },
     );
   }
 }

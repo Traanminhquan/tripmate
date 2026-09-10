@@ -12,6 +12,8 @@ import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/trips/trips_screen.dart';
 import '../../presentation/screens/trips/create_trip_screen.dart';
 import '../../presentation/screens/trips/trip_detail_screen.dart';
+import '../../presentation/screens/trips/edit_trip_screen.dart';
+import '../../domain/entities/trip.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -128,6 +130,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         tripId: tripId,
                       );
                     },
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        builder: (context, state) {
+                          final trip =
+                              state.extra as Trip;
+
+                          return EditTripScreen(
+                            trip: trip,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -108,6 +108,39 @@ class TripController
       );
     });
   }
+
+  Future<void> updateTrip({
+    required Trip trip,
+    required String title,
+    required String destination,
+    required String country,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final updatedTrip = Trip(
+        id: trip.id,
+        ownerId: trip.ownerId,
+        title: title,
+        destination: destination,
+        country: country,
+        startDate: startDate,
+        endDate: endDate,
+        coverImage: trip.coverImage,
+        memberIds: trip.memberIds,
+        createdAt: trip.createdAt,
+      );
+
+      await ref
+          .read(tripRepositoryProvider)
+          .updateTrip(updatedTrip);
+
+      ref.invalidate(userTripsProvider);
+      ref.invalidate(tripByIdProvider(trip.id));
+    });
+  }
 }
 
 final tripControllerProvider =
