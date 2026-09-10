@@ -93,6 +93,7 @@ class ItineraryScreen extends ConsumerWidget {
 
                   ..._buildDays(
                     context,
+                    tripId,
                     trip.startDate,
                     trip.endDate,
                     activities,
@@ -108,6 +109,7 @@ class ItineraryScreen extends ConsumerWidget {
 
   List<Widget> _buildDays(
     BuildContext context,
+    String tripId,
     DateTime startDate,
     DateTime endDate,
     List<TripActivity> activities,
@@ -141,6 +143,7 @@ class ItineraryScreen extends ConsumerWidget {
 
       widgets.add(
         _DaySection(
+          tripId: tripId,
           dayNumber: dayNumber,
           date: current,
           activities: dayActivities,
@@ -171,16 +174,52 @@ class ItineraryScreen extends ConsumerWidget {
   }
 }
 
-class _DaySection extends StatelessWidget {
+class _DaySection extends ConsumerStatefulWidget {
+  final String tripId;
   final int dayNumber;
   final DateTime date;
   final List<TripActivity> activities;
 
   const _DaySection({
+    required this.tripId,
     required this.dayNumber,
     required this.date,
     required this.activities,
   });
+
+  @override
+  ConsumerState<_DaySection> createState() =>
+      _DaySectionState();
+}
+
+class _DaySectionState
+    extends ConsumerState<_DaySection> {
+  late List<TripActivity> _activities;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _activities =
+        List<TripActivity>.from(
+      widget.activities,
+    );
+  }
+
+  @override
+  void didUpdateWidget(
+    covariant _DaySection oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.activities !=
+        widget.activities) {
+      _activities =
+          List<TripActivity>.from(
+        widget.activities,
+      );
+    }
+  }
 
   String _formatDate(DateTime date) {
     final day =
@@ -192,6 +231,55 @@ class _DaySection extends StatelessWidget {
     return '$day/$month/${date.year}';
   }
 
+  Future<void> _onReorder(
+    int oldIndex,
+    int newIndex,
+  ) async {
+    if (newIndex > oldIndex) {
+      newIndex--;
+    }
+
+    setState(() {
+      final item =
+          _activities.removeAt(oldIndex);
+
+      _activities.insert(
+        newIndex,
+        item,
+      );
+    });
+
+    await ref
+        .read(
+          activityControllerProvider.notifier,
+        )
+        .reorderActivities(
+          tripId: widget.tripId,
+          activities: _activities,
+        );
+
+    final state = ref.read(
+      activityControllerProvider,
+    );
+
+    if (!mounted) return;
+
+    if (state.hasError) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to reorder activities: ${state.error}',
+          ),
+        ),
+      );
+
+      ref.invalidate(
+        activitiesProvider(widget.tripId),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -199,7 +287,7 @@ class _DaySection extends StatelessWidget {
           CrossAxisAlignment.start,
       children: [
         Text(
-          'Day $dayNumber',
+          'Day ${widget.dayNumber}',
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -209,15 +297,14 @@ class _DaySection extends StatelessWidget {
         const SizedBox(height: 2),
 
         Text(
-          _formatDate(date),
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium,
+          _formatDate(widget.date),
+          style:
+              Theme.of(context).textTheme.bodyMedium,
         ),
 
         const SizedBox(height: 12),
 
-        if (activities.isEmpty)
+        if (_activities.isEmpty)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(18),
@@ -233,11 +320,26 @@ class _DaySection extends StatelessWidget {
             ),
           )
         else
-          ...activities.map(
-            (activity) =>
-                _ActivityCard(
-              activity: activity,
-            ),
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            physics:
+                const NeverScrollableScrollPhysics(),
+            itemCount: _activities.length,
+            onReorder: _onReorder,
+            itemBuilder: (
+              context,
+              index,
+            ) {
+              final activity =
+                  _activities[index];
+
+              return _ActivityCard(
+                key: ValueKey(
+                  activity.id,
+                ),
+                activity: activity,
+              );
+            },
           ),
       ],
     );
@@ -248,6 +350,7 @@ class _ActivityCard extends StatelessWidget {
   final TripActivity activity;
 
   const _ActivityCard({
+    super.key,
     required this.activity,
   });
 
@@ -345,9 +448,10 @@ class _ActivityCard extends StatelessWidget {
                 ],
               ),
             ),
-
+            const SizedBox(width: 8),
             const Icon(
-              Icons.chevron_right,
+              Icons.drag_handle,
+              color: AppColors.textSecondary,
             ),
           ],
         ),

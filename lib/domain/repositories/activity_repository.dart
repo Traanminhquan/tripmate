@@ -17,4 +17,9 @@ abstract class ActivityRepository {
     required String tripId,
     required String activityId,
   });
+
+  Future<void> updateActivityOrder({
+    required String tripId,
+    required List<TripActivity> activities,
+  });
 }

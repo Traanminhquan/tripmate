@@ -144,7 +144,47 @@ class ActivityController
       );
     });
   }
-  
+
+  Future<void> reorderActivities({
+    required String tripId,
+    required List<TripActivity> activities,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final reorderedActivities =
+          <TripActivity>[];
+
+      for (int i = 0; i < activities.length; i++) {
+        final activity = activities[i];
+
+        reorderedActivities.add(
+          TripActivity(
+            id: activity.id,
+            tripId: activity.tripId,
+            title: activity.title,
+            location: activity.location,
+            date: activity.date,
+            startTime: activity.startTime,
+            note: activity.note,
+            order: i,
+            createdAt: activity.createdAt,
+          ),
+        );
+      }
+
+      await ref
+          .read(activityRepositoryProvider)
+          .updateActivityOrder(
+            tripId: tripId,
+            activities: reorderedActivities,
+          );
+
+      ref.invalidate(
+        activitiesProvider(tripId),
+      );
+    });
+  }
   bool _sameDate(
     DateTime first,
     DateTime second,

@@ -72,4 +72,28 @@ class ActivityRemoteDataSource {
         .doc(activityId)
         .delete();
   }
+
+  Future<void> updateActivityOrder({
+    required String tripId,
+    required List<TripActivityModel> activities,
+  }) async {
+    final batch = firestore.batch();
+
+    for (final activity in activities) {
+      final document = firestore
+          .collection('trips')
+          .doc(tripId)
+          .collection('activities')
+          .doc(activity.id);
+
+      batch.update(
+        document,
+        {
+          'order': activity.order,
+        },
+      );
+    }
+
+    await batch.commit();
+  }
 }

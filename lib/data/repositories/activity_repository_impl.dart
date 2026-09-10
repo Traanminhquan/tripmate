@@ -72,4 +72,29 @@ class ActivityRepositoryImpl
       activityId: activityId,
     );
   }
+
+  @override
+  Future<void> updateActivityOrder({
+    required String tripId,
+    required List<TripActivity> activities,
+  }) {
+    final models = activities.map((activity) {
+      return TripActivityModel(
+        id: activity.id,
+        tripId: activity.tripId,
+        title: activity.title,
+        location: activity.location,
+        date: activity.date,
+        startTime: activity.startTime,
+        note: activity.note,
+        order: activity.order,
+        createdAt: activity.createdAt,
+      );
+    }).toList();
+
+    return remoteDataSource.updateActivityOrder(
+      tripId: tripId,
+      activities: models,
+    );
+  }
 }
