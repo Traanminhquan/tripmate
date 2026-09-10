@@ -40,6 +40,7 @@ class _RegisterScreenState
     }
 
     await ref.read(authControllerProvider.notifier).register(
+          name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
+import 'user_provider.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
@@ -33,15 +34,27 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> build() async {}
 
   Future<void> register({
+    required String name,
     required String email,
     required String password,
   }) async {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await ref.read(authRepositoryProvider).register(
+      final user =
+          await ref.read(authRepositoryProvider).register(
+                email: email,
+                password: password,
+              );
+
+      if (user == null) {
+        throw Exception('Unable to create user account');
+      }
+
+      await ref.read(userRepositoryProvider).createUser(
+            uid: user.uid,
+            name: name,
             email: email,
-            password: password,
           );
     });
   }

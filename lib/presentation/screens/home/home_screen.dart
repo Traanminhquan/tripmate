@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,15 @@ class HomeScreen extends ConsumerWidget {
   ) {
     final authState = ref.watch(authControllerProvider);
 
+    final firebaseUser =
+      ref.watch(firebaseAuthProvider).currentUser;
+    
+    final profileAsync = firebaseUser == null
+      ? null
+      : ref.watch(
+          currentUserProfileProvider(firebaseUser.uid),
+        );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TripMate'),
@@ -47,15 +57,51 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          'Home Screen',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+      body: firebaseUser == null
+        ? const Center(
+            child: Text('No user'),
+          )
+        : profileAsync!.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
+            ),
+
+            error: (error, stackTrace) => Center(
+              child: Text(
+                'Error: $error',
+              ),
+            ),
+
+            data: (profile) {
+              if (profile == null) {
+                return const Center(
+                  child: Text(
+                    'Profile not found',
+                  ),
+                );
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome, ${profile.name}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(profile.email),
+                  ],
+                ),
+              );
+            },
           ),
-        ),
-      ),
     );
   }
 }
