@@ -103,6 +103,48 @@ class ActivityController
     });
   }
 
+  Future<void> updateActivity({
+    required TripActivity activity,
+    required String title,
+    required String location,
+    required DateTime date,
+    required String startTime,
+    String? note,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final updatedActivity = TripActivity(
+        id: activity.id,
+        tripId: activity.tripId,
+        title: title,
+        location: location,
+        date: date,
+        startTime: startTime,
+        note: note,
+        order: activity.order,
+        createdAt: activity.createdAt,
+      );
+
+      await ref
+          .read(activityRepositoryProvider)
+          .updateActivity(updatedActivity);
+
+      ref.invalidate(
+        activitiesProvider(activity.tripId),
+      );
+
+      ref.invalidate(
+        activityByIdProvider(
+          (
+            tripId: activity.tripId,
+            activityId: activity.id,
+          ),
+        ),
+      );
+    });
+  }
+  
   bool _sameDate(
     DateTime first,
     DateTime second,
@@ -118,4 +160,23 @@ final activityControllerProvider =
         ActivityController,
         void>(
   ActivityController.new,
+);
+
+final activityByIdProvider =
+    FutureProvider.family<
+        TripActivity?,
+        ({String tripId, String activityId})>(
+  (ref, params) async {
+    final activities = await ref
+        .read(activityRepositoryProvider)
+        .getActivities(params.tripId);
+
+    for (final activity in activities) {
+      if (activity.id == params.activityId) {
+        return activity;
+      }
+    }
+
+    return null;
+  },
 );

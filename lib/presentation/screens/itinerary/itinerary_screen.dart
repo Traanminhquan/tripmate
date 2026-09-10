@@ -253,86 +253,104 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin:
-          const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.border,
+    return InkWell(
+      onTap: () {
+        context.push(
+          '/trips/${activity.tripId}/itinerary/${activity.id}',
+        );
+      },
+      borderRadius:
+          BorderRadius.circular(16),
+      child: Container(
+        margin:
+            const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.border,
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 56,
-            child: Text(
-              activity.startTime,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
+        child: Row(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 56,
+              child: Text(
+                activity.startTime,
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Text(
-                  activity.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 16,
-                      color:
-                          AppColors.textSecondary,
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    activity.title,
+                    style: const TextStyle(
+                      fontWeight:
+                          FontWeight.bold,
+                      fontSize: 16,
                     ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        activity.location,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium,
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons
+                            .location_on_outlined,
+                        size: 16,
+                        color: AppColors
+                            .textSecondary,
                       ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          activity.location,
+                          style:
+                              Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (activity.note != null &&
+                      activity.note!
+                          .trim()
+                          .isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      activity.note!,
+                      style:
+                          Theme.of(context)
+                              .textTheme
+                              .bodyMedium,
                     ),
                   ],
-                ),
-
-                if (activity.note != null &&
-                    activity.note!
-                        .trim()
-                        .isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    activity.note!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium,
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+
+            const Icon(
+              Icons.chevron_right,
+            ),
+          ],
+        ),
       ),
     );
   }

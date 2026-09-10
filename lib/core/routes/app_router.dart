@@ -16,6 +16,9 @@ import '../../presentation/screens/trips/edit_trip_screen.dart';
 import '../../domain/entities/trip.dart';
 import '../../presentation/screens/itinerary/itinerary_screen.dart';
 import '../../presentation/screens/itinerary/create_activity_screen.dart';
+import '../../presentation/screens/itinerary/activity_detail_screen.dart';
+import '../../presentation/screens/itinerary/edit_activity_screen.dart';
+import '../../domain/entities/trip_activity.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -165,6 +168,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                                 tripId: tripId,
                               );
                             },
+                          ),
+
+                          GoRoute(
+                            path: ':activityId',
+                            builder: (context, state) {
+                              final tripId =
+                                  state.pathParameters['tripId']!;
+
+                              final activityId =
+                                  state.pathParameters['activityId']!;
+
+                              return ActivityDetailScreen(
+                                tripId: tripId,
+                                activityId: activityId,
+                              );
+                            },
+                            routes: [
+                              GoRoute(
+                                path: 'edit',
+                                builder: (context, state) {
+                                  final activity =
+                                      state.extra as TripActivity;
+
+                                  return EditActivityScreen(
+                                    activity: activity,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
