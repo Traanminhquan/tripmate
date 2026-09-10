@@ -14,6 +14,8 @@ import '../../presentation/screens/trips/create_trip_screen.dart';
 import '../../presentation/screens/trips/trip_detail_screen.dart';
 import '../../presentation/screens/trips/edit_trip_screen.dart';
 import '../../domain/entities/trip.dart';
+import '../../presentation/screens/itinerary/itinerary_screen.dart';
+import '../../presentation/screens/itinerary/create_activity_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -141,6 +143,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                             trip: trip,
                           );
                         },
+                      ),
+                      GoRoute(
+                        path: 'itinerary',
+                        builder: (context, state) {
+                          final tripId =
+                              state.pathParameters['tripId']!;
+
+                          return ItineraryScreen(
+                            tripId: tripId,
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            path: 'create',
+                            builder: (context, state) {
+                              final tripId =
+                                  state.pathParameters['tripId']!;
+
+                              return CreateActivityScreen(
+                                tripId: tripId,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),

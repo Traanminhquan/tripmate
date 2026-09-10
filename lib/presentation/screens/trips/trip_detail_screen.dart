@@ -284,9 +284,12 @@ class _TripDetailContent extends StatelessWidget {
           _ToolCard(
             icon: Icons.route_outlined,
             title: 'Itinerary',
-            subtitle:
-                'Plan activities for each day',
-            onTap: () {},
+            subtitle: 'Plan activities for each day',
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/itinerary',
+              );
+            },
           ),
 
           const SizedBox(height: 12),
