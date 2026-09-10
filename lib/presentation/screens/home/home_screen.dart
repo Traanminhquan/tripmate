@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../providers/auth_provider.dart';
 
@@ -15,7 +14,8 @@ class HomeScreen extends ConsumerWidget {
         .read(authControllerProvider.notifier)
         .logout();
 
-    final state = ref.read(authControllerProvider);
+    final state =
+        ref.read(authControllerProvider);
 
     if (!context.mounted) return;
 
@@ -25,10 +25,7 @@ class HomeScreen extends ConsumerWidget {
           content: Text('Logout failed'),
         ),
       );
-      return;
     }
-
-    context.go('/login');
   }
 
   @override

@@ -103,8 +103,6 @@ class _RegisterScreenState
 
       return;
     }
-
-    context.go('/home');
   }
 
   @override

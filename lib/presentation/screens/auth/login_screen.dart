@@ -92,8 +92,6 @@ class _LoginScreenState
 
       return;
     }
-
-    context.go('/home');
   }
 
   @override
