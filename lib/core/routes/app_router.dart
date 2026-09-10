@@ -10,6 +10,7 @@ import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/profile/profile_screen.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/trips/trips_screen.dart';
+import '../../presentation/screens/trips/create_trip_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -108,6 +109,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   return const TripsScreen();
                 },
+                routes: [
+                  GoRoute(
+                    path: 'create',
+                    builder: (context, state) {
+                      return const CreateTripScreen();
+                    },
+                  ),
+                ],
               ),
             ],
           ),
