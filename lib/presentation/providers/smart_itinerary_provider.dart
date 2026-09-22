@@ -281,7 +281,7 @@ class SmartItineraryController
           smartItineraryServiceProvider,
         );
 
-        return service.generate(
+       return service.generate(
           places: allPlaces,
           startDate:
               trip.startDate,
@@ -289,6 +289,8 @@ class SmartItineraryController
               trip.endDate,
           existingPlaceIds:
               existingPlaceIds,
+          existingActivities:
+              existingActivities,
           placesPerDay:
               placesPerDay,
         );
