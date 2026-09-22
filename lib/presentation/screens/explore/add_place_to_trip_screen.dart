@@ -126,27 +126,31 @@ class _AddPlaceToTripScreenState
     }
 
     await ref
-        .read(
-          activityControllerProvider
-              .notifier,
-        )
-        .createActivity(
-          tripId: trip.id,
-          title: widget.place.name,
-          location:
-              widget.place.address ??
-                  widget.place.name,
-          date: _selectedDate!,
-          startTime:
-              _formatTime(
-            _selectedTime,
-          ),
-          note:
-              'Added from Explore\n'
-              'Coordinates: '
-              '${widget.place.latitude}, '
-              '${widget.place.longitude}',
-        );
+      .read(
+        activityControllerProvider.notifier,
+      )
+      .createActivity(
+        tripId: trip.id,
+        title: widget.place.name,
+        location:
+            widget.place.address ??
+                widget.place.name,
+        date: _selectedDate!,
+        startTime: _formatTime(
+          _selectedTime,
+        ),
+
+        note: 'Added from Explore',
+
+        latitude:
+            widget.place.latitude,
+
+        longitude:
+            widget.place.longitude,
+
+        placeId:
+            widget.place.id,
+      );
 
     final state = ref.read(
       activityControllerProvider,

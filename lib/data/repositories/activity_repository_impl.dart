@@ -24,6 +24,9 @@ class ActivityRepositoryImpl
       startTime: activity.startTime,
       note: activity.note,
       order: activity.order,
+      latitude: activity.latitude,
+      longitude: activity.longitude,
+      placeId: activity.placeId,
       createdAt: activity.createdAt,
     );
 
@@ -54,6 +57,9 @@ class ActivityRepositoryImpl
       startTime: activity.startTime,
       note: activity.note,
       order: activity.order,
+      latitude: activity.latitude,
+      longitude: activity.longitude,
+      placeId: activity.placeId,
       createdAt: activity.createdAt,
     );
 

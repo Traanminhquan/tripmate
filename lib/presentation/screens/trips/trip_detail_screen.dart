@@ -340,6 +340,20 @@ class _TripDetailContent extends StatelessWidget {
                 'Save memories from your trip',
             onTap: () {},
           ),
+          
+          const SizedBox(height: 12),
+          
+          _ToolCard(
+            icon: Icons.map_outlined,
+            title: 'Trip Map',
+            subtitle:
+                'View places on the map',
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/map',
+              );
+            },
+          ),
         ],
       ),
     );

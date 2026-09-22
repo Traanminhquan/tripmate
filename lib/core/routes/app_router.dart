@@ -27,6 +27,7 @@ import '../../domain/entities/expense.dart';
 import '../../presentation/screens/members/members_screen.dart';
 import '../../domain/entities/app_user.dart';
 import '../../presentation/screens/profile/edit_profile_screen.dart';
+import '../../presentation/screens/trips/trip_map_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -163,6 +164,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
                           return EditTripScreen(
                             trip: trip,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        path: 'map',
+                        builder: (
+                          context,
+                          state,
+                        ) {
+                          final tripId =
+                              state.pathParameters[
+                                  'tripId']!;
+
+                          return TripMapScreen(
+                            tripId: tripId,
                           );
                         },
                       ),

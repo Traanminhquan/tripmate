@@ -13,6 +13,9 @@ class TripActivityModel extends TripActivity {
     super.note,
     required super.order,
     super.createdAt,
+    super.latitude,
+    super.longitude,
+    super.placeId,
   });
 
   factory TripActivityModel.fromMap({
@@ -29,6 +32,16 @@ class TripActivityModel extends TripActivity {
       startTime: map['startTime'] ?? '',
       note: map['note'],
       order: map['order'] ?? 0,
+      latitude:
+          (map['latitude'] as num?)
+              ?.toDouble(),
+
+      longitude:
+          (map['longitude'] as num?)
+              ?.toDouble(),
+
+      placeId:
+          map['placeId']?.toString(),
       createdAt: map['createdAt'] != null
           ? (map['createdAt'] as Timestamp).toDate()
           : null,
@@ -43,6 +56,9 @@ class TripActivityModel extends TripActivity {
       'startTime': startTime,
       'note': note,
       'order': order,
+      'latitude': latitude,
+      'longitude': longitude,
+      'placeId': placeId,
     };
   }
 }

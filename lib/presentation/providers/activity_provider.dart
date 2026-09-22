@@ -44,23 +44,29 @@ class ActivityController
     required DateTime date,
     required String startTime,
     String? note,
+    double? latitude,
+    double? longitude,
+    String? placeId,
   }) async {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      final activities = await ref
-          .read(activityRepositoryProvider)
-          .getActivities(tripId);
+      final existingActivities =
+          await ref.read(
+        activitiesProvider(tripId).future,
+      );
 
-      final activitiesForDate = activities
-          .where(
-            (activity) =>
-                _sameDate(
-              activity.date,
-              date,
-            ),
-          )
-          .toList();
+      final sameDayActivities =
+          existingActivities.where(
+        (activity) {
+          return activity.date.year ==
+                  date.year &&
+              activity.date.month ==
+                  date.month &&
+              activity.date.day ==
+                  date.day;
+        },
+      ).toList();
 
       final activity = TripActivity(
         id: '',
@@ -70,12 +76,20 @@ class ActivityController
         date: date,
         startTime: startTime,
         note: note,
-        order: activitiesForDate.length,
+        order: sameDayActivities.length,
+
+        latitude: latitude,
+        longitude: longitude,
+        placeId: placeId,
       );
 
       await ref
-          .read(activityRepositoryProvider)
-          .createActivity(activity);
+          .read(
+            activityRepositoryProvider,
+          )
+          .createActivity(
+            activity,
+          );
 
       ref.invalidate(
         activitiesProvider(tripId),
@@ -123,6 +137,9 @@ class ActivityController
         startTime: startTime,
         note: note,
         order: activity.order,
+        latitude: activity.latitude,
+        longitude: activity.longitude,
+        placeId: activity.placeId,
         createdAt: activity.createdAt,
       );
 
