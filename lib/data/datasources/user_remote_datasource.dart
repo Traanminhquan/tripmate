@@ -37,4 +37,29 @@ class UserRemoteDataSource {
       document.data()!,
     );
   }
+
+  Future<UserModel?> getUserByEmail(
+    String email,
+  ) async {
+    final snapshot = await firestore
+        .collection('users')
+        .where(
+          'email',
+          isEqualTo: email.trim(),
+        )
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return null;
+    }
+
+    final document =
+        snapshot.docs.first;
+
+    return UserModel.fromMap(
+      document.id,
+      document.data(),
+    );
+  }
 }

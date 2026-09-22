@@ -31,8 +31,8 @@ class TripRemoteDataSource {
     final snapshot = await firestore
         .collection('trips')
         .where(
-          'ownerId',
-          isEqualTo: userId,
+          'memberIds',
+          arrayContains: userId,
         )
         .orderBy('startDate')
         .get();

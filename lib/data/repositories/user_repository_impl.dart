@@ -26,4 +26,13 @@ class UserRepositoryImpl implements UserRepository {
   Future<AppUser?> getUser(String uid) {
     return remoteDataSource.getUser(uid);
   }
+
+  @override
+  Future<AppUser?> getUserByEmail(
+    String email,
+  ) {
+    return remoteDataSource.getUserByEmail(
+      email,
+    );
+  }
 }

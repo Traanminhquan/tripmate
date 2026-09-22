@@ -5,10 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/trip.dart';
 import '../../providers/trip_provider.dart';
+import '../../providers/auth_provider.dart';
 
 class TripsScreen extends ConsumerWidget {
   const TripsScreen({super.key});
-
+  
   @override
   Widget build(
     BuildContext context,
@@ -16,6 +17,9 @@ class TripsScreen extends ConsumerWidget {
   ) {
     final tripsAsync =
         ref.watch(userTripsProvider);
+    
+    final currentUser =
+        ref.watch(firebaseAuthProvider).currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,8 +109,11 @@ class TripsScreen extends ConsumerWidget {
               ),
               itemBuilder:
                   (context, index) {
+                final trip = trips[index];
+
                 return _TripCard(
-                  trip: trips[index],
+                  trip: trip,
+                  isOwner: trip.ownerId == currentUser?.uid,
                 );
               },
             ),
@@ -169,9 +176,12 @@ class _EmptyTrips extends StatelessWidget {
 
 class _TripCard extends StatelessWidget {
   final Trip trip;
-
+  final bool isOwner;
+  
   const _TripCard({
+    super.key,
     required this.trip,
+    required this.isOwner,
   });
 
   String _formatDate(DateTime date) {
@@ -236,18 +246,38 @@ class _TripCard extends StatelessWidget {
                     trip.title,
                     style: const TextStyle(
                       fontSize: 17,
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.1,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isOwner ? 'Owner' : 'Shared',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
 
                   Text(
                     '${trip.destination}, ${trip.country}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
 
                   const SizedBox(height: 8),

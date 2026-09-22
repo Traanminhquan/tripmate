@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/trip.dart';
 import '../../providers/trip_provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/auth_provider.dart';
 
 class TripDetailScreen extends ConsumerWidget {
   Future<void> _deleteTrip(
@@ -94,6 +95,14 @@ class TripDetailScreen extends ConsumerWidget {
       tripControllerProvider,
     );
 
+    final currentUser = ref.watch(
+      firebaseAuthProvider,
+    ).currentUser;
+
+    final controllerState = ref.watch(
+      tripControllerProvider,
+    );
+    
     return tripAsync.when(
       loading: () => const Scaffold(
         body: Center(
@@ -113,6 +122,7 @@ class TripDetailScreen extends ConsumerWidget {
       ),
 
       data: (trip) {
+
         if (trip == null) {
           return Scaffold(
             appBar: AppBar(
@@ -127,42 +137,43 @@ class TripDetailScreen extends ConsumerWidget {
             ),
           );
         }
-
+        final isOwner =
+          currentUser?.uid == trip.ownerId;
         return Scaffold(
           appBar: AppBar(
             title: const Text(
               'Trip Details',
             ),
             actions: [
-              IconButton(
-                onPressed:
-                    tripControllerState.isLoading
-                        ? null
-                        : () {
-                            context.push(
-                              '/trips/$tripId/edit',
-                              extra: trip,
-                            );
-                          },
-                icon: const Icon(
-                  Icons.edit_outlined,
+              if (isOwner)
+                IconButton(
+                  onPressed: controllerState.isLoading
+                      ? null
+                      : () {
+                          context.push(
+                            '/trips/$tripId/edit',
+                            extra: trip,
+                          );
+                        },
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                  ),
                 ),
-              ),
 
-              IconButton(
-                onPressed:
-                    tripControllerState.isLoading
-                        ? null
-                        : () {
-                            _deleteTrip(
-                              context,
-                              ref,
-                            );
-                          },
-                icon: const Icon(
-                  Icons.delete_outline,
+              if (isOwner)
+                IconButton(
+                  onPressed: controllerState.isLoading
+                      ? null
+                      : () {
+                          _deleteTrip(
+                            context,
+                            ref,
+                          );
+                        },
+                  icon: const Icon(
+                    Icons.delete_outline,
+                  ),
                 ),
-              ),
             ],
           ),
           body: tripControllerState.isLoading
@@ -313,7 +324,11 @@ class _TripDetailContent extends StatelessWidget {
             title: 'Members',
             subtitle:
                 'Manage trip members',
-            onTap: () {},
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/members',
+              );
+            },
           ),
 
           const SizedBox(height: 12),

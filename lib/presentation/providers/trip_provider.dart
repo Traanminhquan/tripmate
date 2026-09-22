@@ -141,6 +141,121 @@ class TripController
       ref.invalidate(tripByIdProvider(trip.id));
     });
   }
+
+  Future<void> addMember({
+    required Trip trip,
+    required String email,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final normalizedEmail =
+          email.trim().toLowerCase();
+
+      final userRepository =
+          ref.read(userRepositoryProvider);
+
+      final user =
+          await userRepository
+              .getUserByEmail(
+        normalizedEmail,
+      );
+
+      if (user == null) {
+        throw Exception(
+          'User not found.',
+        );
+      }
+
+      if (trip.memberIds.contains(user.id)) {
+        throw Exception(
+          'User is already a member of this trip.',
+        );
+      }
+
+      final updatedTrip = Trip(
+        id: trip.id,
+        ownerId: trip.ownerId,
+        title: trip.title,
+        destination: trip.destination,
+        country: trip.country,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        coverImage: trip.coverImage,
+        memberIds: [
+          ...trip.memberIds,
+          user.id,
+        ],
+        createdAt: trip.createdAt,
+      );
+
+      await ref
+          .read(tripRepositoryProvider)
+          .updateTrip(updatedTrip);
+    });
+
+    if (!state.hasError) {
+      ref.invalidate(
+        tripByIdProvider(trip.id),
+      );
+
+      ref.invalidate(
+        userTripsProvider,
+      );
+    }
+  }
+
+  Future<void> removeMember({
+    required Trip trip,
+    required String userId,
+  }) async {
+    if (userId == trip.ownerId) {
+      state = AsyncError(
+        Exception(
+          'Trip owner cannot be removed',
+        ),
+        StackTrace.current,
+      );
+
+      return;
+    }
+
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final updatedMembers =
+          trip.memberIds
+              .where(
+                (id) => id != userId,
+              )
+              .toList();
+
+      final updatedTrip = Trip(
+        id: trip.id,
+        ownerId: trip.ownerId,
+        title: trip.title,
+        destination: trip.destination,
+        country: trip.country,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        coverImage: trip.coverImage,
+        memberIds: updatedMembers,
+        createdAt: trip.createdAt,
+      );
+
+      await ref
+          .read(tripRepositoryProvider)
+          .updateTrip(updatedTrip);
+
+      ref.invalidate(
+        tripByIdProvider(trip.id),
+      );
+
+      ref.invalidate(
+        userTripsProvider,
+      );
+    });
+  }
 }
 
 final tripControllerProvider =

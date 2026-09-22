@@ -4,8 +4,10 @@ import '../../data/datasources/expense_remote_datasource.dart';
 import '../../data/repositories/expense_repository_impl.dart';
 import '../../domain/entities/expense.dart';
 import '../../domain/repositories/expense_repository.dart';
-import 'auth_provider.dart';
 import 'user_provider.dart';
+//import '../../domain/entities/settlement.dart';
+import '../../domain/usecases/expense_balance_service.dart';
+import 'trip_provider.dart';
 
 final expenseRemoteDataSourceProvider =
     Provider<ExpenseRemoteDataSource>((ref) {
@@ -43,33 +45,27 @@ class ExpenseController
     required String title,
     required double amount,
     required String category,
+    required String paidBy,
     required DateTime date,
     required List<String> splitBetween,
     String? note,
   }) async {
-    final user = ref
-        .read(firebaseAuthProvider)
-        .currentUser;
-
-    if (user == null) {
-      state = AsyncError(
-        Exception('User is not logged in'),
-        StackTrace.current,
-      );
-
-      return;
-    }
-
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
+      if (splitBetween.isEmpty) {
+        throw Exception(
+          'Select at least one member to split this expense.',
+        );
+      }
+
       final expense = Expense(
         id: '',
         tripId: tripId,
         title: title,
         amount: amount,
         category: category,
-        paidBy: user.uid,
+        paidBy: paidBy,
         date: date,
         splitBetween: splitBetween,
         note: note,
@@ -81,6 +77,10 @@ class ExpenseController
 
       ref.invalidate(
         expensesProvider(tripId),
+      );
+
+      ref.invalidate(
+        expenseBalanceProvider(tripId),
       );
     });
   }
@@ -102,6 +102,10 @@ class ExpenseController
       ref.invalidate(
         expensesProvider(tripId),
       );
+
+      ref.invalidate(
+        expenseBalanceProvider(tripId),
+      );
     });
   }
 
@@ -110,6 +114,7 @@ class ExpenseController
     required String title,
     required double amount,
     required String category,
+    required String paidBy,
     required DateTime date,
     required List<String> splitBetween,
     String? note,
@@ -117,13 +122,19 @@ class ExpenseController
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
+      if (splitBetween.isEmpty) {
+        throw Exception(
+          'Select at least one member to split this expense.',
+        );
+      }
+
       final updatedExpense = Expense(
         id: expense.id,
         tripId: expense.tripId,
         title: title,
         amount: amount,
         category: category,
-        paidBy: expense.paidBy,
+        paidBy: paidBy,
         date: date,
         splitBetween: splitBetween,
         note: note,
@@ -132,10 +143,14 @@ class ExpenseController
 
       await ref
           .read(expenseRepositoryProvider)
-          .updateExpense(updatedExpense);
+          .updateExpense(
+            updatedExpense,
+          );
 
       ref.invalidate(
-        expensesProvider(expense.tripId),
+        expensesProvider(
+          expense.tripId,
+        ),
       );
 
       ref.invalidate(
@@ -144,6 +159,12 @@ class ExpenseController
             tripId: expense.tripId,
             expenseId: expense.id,
           ),
+        ),
+      );
+
+      ref.invalidate(
+        expenseBalanceProvider(
+          expense.tripId,
         ),
       );
     });
@@ -173,5 +194,43 @@ final expenseByIdProvider =
     }
 
     return null;
+  },
+);
+
+final expenseBalanceServiceProvider =
+    Provider<ExpenseBalanceService>((ref) {
+  return ExpenseBalanceService();
+});
+
+final expenseBalanceProvider =
+    FutureProvider.family<
+        ExpenseBalanceResult,
+        String>(
+  (ref, tripId) async {
+    final trip =
+        await ref.watch(
+      tripByIdProvider(tripId).future,
+    );
+
+    if (trip == null) {
+      throw Exception(
+        'Trip not found',
+      );
+    }
+
+    final expenses =
+        await ref.watch(
+      expensesProvider(tripId).future,
+    );
+
+    return ref
+        .read(
+          expenseBalanceServiceProvider,
+        )
+        .calculate(
+          expenses: expenses,
+          memberIds:
+              trip.memberIds,
+        );
   },
 );

@@ -30,3 +30,35 @@ final currentUserProfileProvider =
     FutureProvider.family<AppUser?, String>((ref, uid) {
   return ref.read(userRepositoryProvider).getUser(uid);
 });
+
+final tripMembersProvider =
+    FutureProvider.family<
+        List<AppUser>,
+        List<String>>(
+  (ref, memberIds) async {
+    final repository =
+        ref.read(userRepositoryProvider);
+
+    final members = <AppUser>[];
+
+    for (final uid in memberIds) {
+      final user =
+          await repository.getUser(uid);
+
+      if (user != null) {
+        members.add(user);
+      }
+    }
+
+    return members;
+  },
+);
+
+final userByIdProvider =
+    FutureProvider.family<AppUser?, String>(
+  (ref, uid) {
+    return ref
+        .read(userRepositoryProvider)
+        .getUser(uid);
+  },
+);

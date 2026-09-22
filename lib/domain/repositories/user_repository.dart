@@ -8,4 +8,8 @@ abstract class UserRepository {
   });
 
   Future<AppUser?> getUser(String uid);
+
+  Future<AppUser?> getUserByEmail(
+    String email,
+  );
 }

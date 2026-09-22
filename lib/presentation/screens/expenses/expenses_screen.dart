@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/trip_provider.dart';
+import '../../../domain/entities/settlement.dart';
+import '../../providers/user_provider.dart';
 
 class ExpensesScreen extends ConsumerWidget {
   final String tripId;
@@ -70,6 +72,10 @@ class ExpensesScreen extends ConsumerWidget {
 
     final expensesAsync = ref.watch(
       expensesProvider(tripId),
+    );
+
+    final balanceAsync = ref.watch(
+      expenseBalanceProvider(tripId),
     );
 
     return Scaffold(
@@ -217,6 +223,67 @@ class ExpensesScreen extends ConsumerWidget {
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge,
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  Text(
+                    'Group Balance',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  balanceAsync.when(
+                    loading: () =>
+                        const Center(
+                      child:
+                          CircularProgressIndicator(),
+                    ),
+
+                    error: (
+                      error,
+                      stackTrace,
+                    ) =>
+                        Text(
+                      'Failed to calculate balance: $error',
+                    ),
+
+                    data: (result) {
+                      if (result.settlements.isEmpty) {
+                        return Container(
+                          width: double.infinity,
+                          padding:
+                              const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.border,
+                            ),
+                          ),
+                          child: const Text(
+                            'Everyone is settled up.',
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children:
+                            result.settlements
+                                .map(
+                                  (settlement) =>
+                                      _SettlementCard(
+                                    settlement:
+                                        settlement,
+                                  ),
+                                )
+                                .toList(),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 14),
@@ -488,5 +555,138 @@ class _CategoryProgress extends StatelessWidget {
       default:
         return Icons.receipt_long;
     }
+  }
+}
+
+class _SettlementCard
+    extends ConsumerWidget {
+  final Settlement settlement;
+
+  const _SettlementCard({
+    required this.settlement,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final fromAsync = ref.watch(
+      userByIdProvider(
+        settlement.fromUserId,
+      ),
+    );
+
+    final toAsync = ref.watch(
+      userByIdProvider(
+        settlement.toUserId,
+      ),
+    );
+
+    return Container(
+      margin:
+          const EdgeInsets.only(
+        bottom: 10,
+      ),
+      padding:
+          const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius:
+            BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.border,
+        ),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            child: Icon(
+              Icons.swap_horiz,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: fromAsync.when(
+              loading: () =>
+                  const Text(
+                'Loading...',
+              ),
+
+              error: (
+                error,
+                stackTrace,
+              ) =>
+                  const Text(
+                'Unknown user',
+              ),
+
+              data: (fromUser) {
+                return toAsync.when(
+                  loading: () =>
+                      const Text(
+                    'Loading...',
+                  ),
+
+                  error: (
+                    error,
+                    stackTrace,
+                  ) =>
+                      const Text(
+                    'Unknown user',
+                  ),
+
+                  data: (toUser) {
+                    return Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                fromUser?.name ??
+                                    'Unknown',
+                            style:
+                                const TextStyle(
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: ' owes ',
+                          ),
+                          TextSpan(
+                            text:
+                                toUser?.name ??
+                                    'Unknown',
+                            style:
+                                const TextStyle(
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+
+          Text(
+            '\$${settlement.amount.toStringAsFixed(2)}',
+            style:
+                const TextStyle(
+              fontSize: 16,
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
