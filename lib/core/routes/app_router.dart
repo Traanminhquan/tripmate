@@ -34,6 +34,7 @@ import '../../presentation/screens/journal/create_journal_entry_screen.dart';
 import '../../presentation/screens/journal/journal_detail_screen.dart';
 import '../../presentation/screens/journal/edit_journal_entry_screen.dart';
 import '../../domain/entities/journal_entry.dart';
+import '../../presentation/screens/itinerary/smart_itinerary_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -162,6 +163,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                           );
                         },
                       ),
+
+                      GoRoute(
+                        path: 'smart-itinerary',
+                        builder: (
+                          context,
+                          state,
+                        ) {
+                          final tripId =
+                              state.pathParameters[
+                                  'tripId']!;
+
+                          return SmartItineraryScreen(
+                            tripId: tripId,
+                          );
+                        },
+                      ),
+                      
                       GoRoute(
                         path: 'edit',
                         builder: (context, state) {

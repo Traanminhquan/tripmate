@@ -348,6 +348,20 @@ class _TripDetailContent extends StatelessWidget {
           const SizedBox(height: 12),
 
           _ToolCard(
+            icon: Icons.auto_awesome,
+            title: 'Smart Planner',
+            subtitle:
+                'Generate itinerary automatically',
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/smart-itinerary',
+              );
+            },
+          ),
+
+          const SizedBox(height: 12),
+          
+          _ToolCard(
             icon: Icons.map_outlined,
             title: 'Trip Map',
             subtitle:
