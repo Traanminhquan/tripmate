@@ -31,6 +31,9 @@ import '../../presentation/screens/trips/trip_map_screen.dart';
 import '../../presentation/screens/favorites/favorites_screen.dart';
 import '../../presentation/screens/journal/journal_screen.dart';
 import '../../presentation/screens/journal/create_journal_entry_screen.dart';
+import '../../presentation/screens/journal/journal_detail_screen.dart';
+import '../../presentation/screens/journal/edit_journal_entry_screen.dart';
+import '../../domain/entities/journal_entry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -268,6 +271,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                                 tripId: tripId,
                               );
                             },
+                          ),
+
+                          GoRoute(
+                            path: ':entryId',
+                            builder: (
+                              context,
+                              state,
+                            ) {
+                              final entry =
+                                  state.extra
+                                      as JournalEntry;
+
+                              return JournalDetailScreen(
+                                entry: entry,
+                              );
+                            },
+                            routes: [
+                              GoRoute(
+                                path: 'edit',
+                                builder: (
+                                  context,
+                                  state,
+                                ) {
+                                  final entry =
+                                      state.extra
+                                          as JournalEntry;
+
+                                  return EditJournalEntryScreen(
+                                    entry:
+                                        entry,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
