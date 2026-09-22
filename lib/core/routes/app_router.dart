@@ -29,6 +29,8 @@ import '../../domain/entities/app_user.dart';
 import '../../presentation/screens/profile/edit_profile_screen.dart';
 import '../../presentation/screens/trips/trip_map_screen.dart';
 import '../../presentation/screens/favorites/favorites_screen.dart';
+import '../../presentation/screens/journal/journal_screen.dart';
+import '../../presentation/screens/journal/create_journal_entry_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -233,6 +235,39 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                                 },
                               ),
                             ],
+                          ),
+                        ],
+                      ),
+
+                      GoRoute(
+                        path: 'journal',
+                        builder: (
+                          context,
+                          state,
+                        ) {
+                          final tripId =
+                              state.pathParameters[
+                                  'tripId']!;
+
+                          return JournalScreen(
+                            tripId: tripId,
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            path: 'create',
+                            builder: (
+                              context,
+                              state,
+                            ) {
+                              final tripId =
+                                  state.pathParameters[
+                                      'tripId']!;
+
+                              return CreateJournalEntryScreen(
+                                tripId: tripId,
+                              );
+                            },
                           ),
                         ],
                       ),

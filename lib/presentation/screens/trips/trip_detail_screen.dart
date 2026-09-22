@@ -337,12 +337,16 @@ class _TripDetailContent extends StatelessWidget {
             icon: Icons.menu_book_outlined,
             title: 'Journal',
             subtitle:
-                'Save memories from your trip',
-            onTap: () {},
+                'Save trip memories',
+            onTap: () {
+              context.push(
+                '/trips/${trip.id}/journal',
+              );
+            },
           ),
           
           const SizedBox(height: 12),
-          
+
           _ToolCard(
             icon: Icons.map_outlined,
             title: 'Trip Map',
