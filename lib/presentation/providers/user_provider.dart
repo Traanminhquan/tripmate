@@ -62,3 +62,45 @@ final userByIdProvider =
         .getUser(uid);
   },
 );
+
+class UserController
+    extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> updateProfile({
+    required String uid,
+    required String name,
+    String? bio,
+    required List<String> travelPreferences,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      await ref
+          .read(userRepositoryProvider)
+          .updateUserProfile(
+            uid: uid,
+            name: name,
+            bio: bio,
+            travelPreferences:
+                travelPreferences,
+          );
+
+      ref.invalidate(
+        currentUserProfileProvider(uid),
+      );
+
+      ref.invalidate(
+        userByIdProvider(uid),
+      );
+    });
+  }
+}
+
+final userControllerProvider =
+    AsyncNotifierProvider<
+        UserController,
+        void>(
+  UserController.new,
+);

@@ -35,4 +35,20 @@ class UserRepositoryImpl implements UserRepository {
       email,
     );
   }
+
+  @override
+  Future<void> updateUserProfile({
+    required String uid,
+    required String name,
+    String? bio,
+    required List<String> travelPreferences,
+  }) {
+    return remoteDataSource.updateUserProfile(
+      uid: uid,
+      name: name,
+      bio: bio,
+      travelPreferences:
+          travelPreferences,
+    );
+  }
 }

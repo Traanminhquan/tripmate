@@ -25,6 +25,8 @@ import '../../presentation/screens/expenses/expense_detail_screen.dart';
 import '../../presentation/screens/expenses/edit_expense_screen.dart';
 import '../../domain/entities/expense.dart';
 import '../../presentation/screens/members/members_screen.dart';
+import '../../domain/entities/app_user.dart';
+import '../../presentation/screens/profile/edit_profile_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -293,9 +295,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/profile',
-                builder: (context, state) {
+                builder: (
+                  context,
+                  state,
+                ) {
                   return const ProfileScreen();
                 },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (
+                      context,
+                      state,
+                    ) {
+                      final user =
+                          state.extra
+                              as AppUser;
+
+                      return EditProfileScreen(
+                        user: user,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

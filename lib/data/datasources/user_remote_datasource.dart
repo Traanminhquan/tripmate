@@ -62,4 +62,21 @@ class UserRemoteDataSource {
       document.data(),
     );
   }
+
+  Future<void> updateUserProfile({
+    required String uid,
+    required String name,
+    String? bio,
+    required List<String> travelPreferences,
+  }) async {
+    await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+      'name': name,
+      'bio': bio,
+      'travelPreferences':
+          travelPreferences,
+    });
+  }
 }
