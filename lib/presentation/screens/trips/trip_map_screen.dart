@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/trip_activity.dart';
 import '../../providers/activity_provider.dart';
 import '../../providers/trip_provider.dart';
+import '../../../core/constants/api_constants.dart';
 
 class TripMapScreen extends ConsumerWidget {
   final String tripId;
@@ -123,22 +124,18 @@ class TripMapScreen extends ConsumerWidget {
                     child: FlutterMap(
                       options: mappedActivities.length == 1
                           ? MapOptions(
-                              initialCenter:
-                                  LatLng(
+                              initialCenter: LatLng(
                                 mappedActivities.first.latitude!,
                                 mappedActivities.first.longitude!,
                               ),
                               initialZoom: 15,
                             )
                           : MapOptions(
-                              initialCameraFit:
-                                  CameraFit.bounds(
-                                bounds:
-                                    LatLngBounds.fromPoints(
+                              initialCameraFit: CameraFit.bounds(
+                                bounds: LatLngBounds.fromPoints(
                                   points,
                                 ),
-                                padding:
-                                    const EdgeInsets.all(
+                                padding: const EdgeInsets.all(
                                   60,
                                 ),
                               ),
@@ -146,57 +143,60 @@ class TripMapScreen extends ConsumerWidget {
                       children: [
                         TileLayer(
                           urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-                          // Đổi thành package name thực tế
-                          // trong android/app/build.gradle(.kts)
-                          userAgentPackageName:
-                              'com.example.tripmate',
+                              'https://maps.geoapify.com/v1/tile/osm-bright/'
+                              '{z}/{x}/{y}.png'
+                              '?apiKey=${ApiConstants.geoapifyApiKey}',
+                          maxNativeZoom: 20,
+                          errorTileCallback: (
+                            tile,
+                            error,
+                            stackTrace,
+                          ) {
+                            debugPrint(
+                              'MAP TILE ERROR: $error',
+                            );
+                          },
                         ),
 
                         MarkerLayer(
-                          markers:
-                              mappedActivities
-                                  .asMap()
-                                  .entries
-                                  .map(
-                                    (entry) {
-                                      final index =
-                                          entry.key;
+                          markers: mappedActivities
+                              .asMap()
+                              .entries
+                              .map(
+                            (entry) {
+                              final index = entry.key;
+                              final activity =
+                                  entry.value;
 
-                                      final activity =
-                                          entry.value;
-
-                                      return Marker(
-                                        point: LatLng(
-                                          activity.latitude!,
-                                          activity.longitude!,
-                                        ),
-                                        width: 48,
-                                        height: 48,
-                                        child:
-                                            GestureDetector(
-                                          onTap: () {
-                                            _showActivity(
-                                              context,
-                                              activity,
-                                              index + 1,
-                                            );
-                                          },
-                                          child:
-                                              _NumberedMarker(
-                                            number:
-                                                index + 1,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  )
-                                  .toList(),
+                              return Marker(
+                                point: LatLng(
+                                  activity.latitude!,
+                                  activity.longitude!,
+                                ),
+                                width: 48,
+                                height: 48,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showActivity(
+                                      context,
+                                      activity,
+                                      index + 1,
+                                    );
+                                  },
+                                  child: _NumberedMarker(
+                                    number: index + 1,
+                                  ),
+                                ),
+                              );
+                            },
+                          ).toList(),
                         ),
 
                         RichAttributionWidget(
                           attributions: [
+                            TextSourceAttribution(
+                              'Geoapify',
+                            ),
                             TextSourceAttribution(
                               'OpenStreetMap contributors',
                             ),
