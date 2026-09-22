@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/place.dart';
 import 'add_place_to_trip_screen.dart';
+import '../../providers/favorite_provider.dart';
 
 class PlaceDetailScreen extends ConsumerWidget {
   final Place place;
@@ -13,16 +14,74 @@ class PlaceDetailScreen extends ConsumerWidget {
     required this.place,
   });
 
+  
   @override
   Widget build(
     BuildContext context,
     WidgetRef ref,
   ) {
+    final favoriteAsync =
+        ref.watch(
+      isFavoriteProvider(
+        place.id,
+      ),
+    );
+
+    final favoriteState =
+        ref.watch(
+      favoriteControllerProvider,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Place Detail',
         ),
+        actions: [
+          favoriteAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child:
+                    CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+            ),
+
+            error: (_, __) =>
+                const SizedBox.shrink(),
+
+            data: (isFavorite) {
+              return IconButton(
+                onPressed:
+                    favoriteState.isLoading
+                        ? null
+                        : () async {
+                            await ref
+                                .read(
+                                  favoriteControllerProvider
+                                      .notifier,
+                                )
+                                .toggleFavorite(
+                                  place,
+                                );
+                          },
+                icon: Icon(
+                  isFavorite
+                      ? Icons.favorite
+                      : Icons
+                          .favorite_border,
+                  color: isFavorite
+                      ? Colors.red
+                      : null,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),

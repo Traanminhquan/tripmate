@@ -28,6 +28,7 @@ import '../../presentation/screens/members/members_screen.dart';
 import '../../domain/entities/app_user.dart';
 import '../../presentation/screens/profile/edit_profile_screen.dart';
 import '../../presentation/screens/trips/trip_map_screen.dart';
+import '../../presentation/screens/favorites/favorites_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -302,6 +303,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/explore',
                 builder: (context, state) {
                   return const ExploreScreen();
+                },
+              ),
+
+              GoRoute(
+                path: '/favorites',
+                builder: (
+                  context,
+                  state,
+                ) {
+                  return const FavoritesScreen();
                 },
               ),
             ],

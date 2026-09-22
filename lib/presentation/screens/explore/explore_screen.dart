@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/place.dart';
 import '../../providers/place_provider.dart';
 import 'place_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({
@@ -195,8 +196,19 @@ class _ExploreScreenState
         title: const Text(
           'Explore',
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.push(
+                '/favorites',
+              );
+            },
+            icon: const Icon(
+              Icons.favorite_outline,
+            ),
+          ),
+        ],
       ),
-
       body: RefreshIndicator(
         onRefresh: _loadPlaces,
         child: ListView(
