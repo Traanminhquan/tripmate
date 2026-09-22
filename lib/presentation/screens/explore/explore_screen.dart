@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/place.dart';
 import '../../providers/place_provider.dart';
+import 'place_detail_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({
@@ -518,125 +519,97 @@ class _PlaceCard
   Widget build(
     BuildContext context,
   ) {
-    return Container(
-      margin:
-          const EdgeInsets.only(
-        bottom: 12,
-      ),
-      padding:
-          const EdgeInsets.all(
-        16,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(
-          16,
-        ),
-        border: Border.all(
-          color:
-              AppColors.border,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration:
-                BoxDecoration(
-              color:
-                  AppColors.primary
-                      .withValues(
-                alpha: 0.1,
-              ),
-              borderRadius:
-                  BorderRadius
-                      .circular(
-                12,
-              ),
-            ),
-            child: const Icon(
-              Icons.place_outlined,
-              color:
-                  AppColors.primary,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) =>
+                PlaceDetailScreen(
+              place: place,
             ),
           ),
-
-          const SizedBox(
-            width: 14,
+        );
+      },
+      borderRadius:
+          BorderRadius.circular(16),
+      child: Container(
+        margin:
+            const EdgeInsets.only(
+          bottom: 12,
+        ),
+        padding:
+            const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.border,
           ),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
-              children: [
-                Text(
-                  place.name,
-                  style:
-                      const TextStyle(
-                    fontSize: 16,
-                    fontWeight:
-                        FontWeight
-                            .w600,
-                  ),
+        ),
+        child: Row(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary
+                    .withValues(
+                  alpha: 0.1,
                 ),
-
-                const SizedBox(
-                  height: 6,
+                borderRadius:
+                    BorderRadius.circular(
+                  12,
                 ),
+              ),
+              child: const Icon(
+                Icons.place_outlined,
+                color:
+                    AppColors.primary,
+              ),
+            ),
 
-                if (place.address !=
-                        null &&
-                    place.address!
-                        .isNotEmpty)
+            const SizedBox(width: 14),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
                   Text(
-                    place.address!,
+                    place.name,
                     style:
-                        Theme.of(
-                      context,
-                    )
-                            .textTheme
-                            .bodyMedium,
+                        const TextStyle(
+                      fontSize: 16,
+                      fontWeight:
+                          FontWeight.w600,
+                    ),
                   ),
 
-                const SizedBox(
-                  height: 8,
-                ),
+                  const SizedBox(height: 6),
 
-                Row(
-                  children: [
-                    const Icon(
-                      Icons
-                          .location_on_outlined,
-                      size: 16,
+                  if (place.address !=
+                          null &&
+                      place.address!
+                          .isNotEmpty)
+                    Text(
+                      place.address!,
+                      style:
+                          Theme.of(context)
+                              .textTheme
+                              .bodyMedium,
                     ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${place.latitude.toStringAsFixed(4)}, '
-                        '${place.longitude.toStringAsFixed(4)}',
-                        style:
-                            Theme.of(
-                          context,
-                        )
-                                .textTheme
-                                .bodySmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+
+            const Icon(
+              Icons.chevron_right,
+            ),
+          ],
+        ),
       ),
     );
   }
